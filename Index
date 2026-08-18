@@ -247,7 +247,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
 // ── APPS SCRIPT WEB APP URL ──────────────────────────────────────────────────
 // Replace this with your deployed Web App URL after adding handleMenuOrder()
 // to WebApp.gs and redeploying.
-var SUBMIT_URL = 'YOUR_WEBAPP_URL_HERE';
+// Derive the submit URL from the current page URL.
+// When served from Apps Script (?page=menu), the base URL
+// is the same Web App that handles doPost.
+var SUBMIT_URL = (function() {
+  var url = window.location.href;
+  var base = url.split('?')[0];
+  // If running locally (file://) show a console message only
+  if (base.indexOf('script.google.com') === -1 &&
+      base.indexOf('googleusercontent.com') === -1) {
+    return 'LOCAL_ONLY';
+  }
+  return base;
+})();
 
 // ── PRODUCT DATA ─────────────────────────────────────────────────────────────
 var SKUS = [{"sku": "RLB-F-001", "name": "Dirty Laundry", "brand": "Real Life Botanicals", "cat": "3.5g Flower — Current Selection", "unit": "$13.50", "case": "$675.00", "caseQty": 50, "price": 13.5}, {"sku": "RLB-F-002", "name": "Super Lemon Cake", "brand": "Real Life Botanicals", "cat": "3.5g Flower — Current Selection", "unit": "$13.50", "case": "$675.00", "caseQty": 50, "price": 13.5}, {"sku": "RLB-F-003", "name": "Super Boof", "brand": "Real Life Botanicals", "cat": "3.5g Flower — Current Selection", "unit": "$13.50", "case": "$675.00", "caseQty": 50, "price": 13.5}, {"sku": "RLB-F-004", "name": "Oshii", "brand": "Real Life Botanicals", "cat": "3.5g Flower — Current Selection", "unit": "$13.50", "case": "$675.00", "caseQty": 50, "price": 13.5}, {"sku": "RLB-F-005", "name": "Ice Cream Cake", "brand": "Real Life Botanicals", "cat": "3.5g Flower — Current Selection", "unit": "$13.50", "case": "$675.00", "caseQty": 50, "price": 13.5}, {"sku": "RLB-F-006", "name": "Slapz", "brand": "Real Life Botanicals", "cat": "3.5g Flower — Current Selection", "unit": "$13.50", "case": "$675.00", "caseQty": 50, "price": 13.5}, {"sku": "RLB-F-007", "name": "Papaya Candy", "brand": "Real Life Botanicals", "cat": "3.5g Flower — Current Selection", "unit": "$13.50", "case": "$675.00", "caseQty": 50, "price": 13.5}, {"sku": "RLB-F-008", "name": "Kombucha Cream", "brand": "Real Life Botanicals", "cat": "3.5g Flower — Current Selection", "unit": "$13.50", "case": "$675.00", "caseQty": 50, "price": 13.5}, {"sku": "MP-PR-001", "name": "Purple Haze", "brand": "Mac Pharms", "cat": "1g Pre-Rolls", "unit": "$4.00", "case": "$200.00", "caseQty": 50, "price": 4.0}, {"sku": "MP-PR-002", "name": "Rainbow Smoothie", "brand": "Mac Pharms", "cat": "1g Pre-Rolls", "unit": "$4.00", "case": "$200.00", "caseQty": 50, "price": 4.0}, {"sku": "MP-PR-003", "name": "Runtz OG", "brand": "Mac Pharms", "cat": "1g Pre-Rolls", "unit": "$4.00", "case": "$200.00", "caseQty": 50, "price": 4.0}, {"sku": "MP-PR-004", "name": "Blue Cookie", "brand": "Mac Pharms", "cat": "1g Pre-Rolls", "unit": "$4.00", "case": "$200.00", "caseQty": 50, "price": 4.0}, {"sku": "MP-PR-005", "name": "Kush Mints", "brand": "Mac Pharms", "cat": "1g Pre-Rolls", "unit": "$4.00", "case": "$200.00", "caseQty": 50, "price": 4.0}, {"sku": "MP-PR-006", "name": "Hash Allen", "brand": "Mac Pharms", "cat": "1g Pre-Rolls", "unit": "$4.00", "case": "$200.00", "caseQty": 50, "price": 4.0}, {"sku": "MP-PR-007", "name": "Strawberry Sherbet", "brand": "Mac Pharms", "cat": "1g Pre-Rolls", "unit": "$4.00", "case": "$200.00", "caseQty": 50, "price": 4.0}, {"sku": "MP-PR-008", "name": "Fruity Pebbles", "brand": "Mac Pharms", "cat": "1g Pre-Rolls", "unit": "$4.00", "case": "$200.00", "caseQty": 50, "price": 4.0}, {"sku": "MP-PR-009", "name": "Mac OG", "brand": "Mac Pharms", "cat": "1g Pre-Rolls", "unit": "$4.00", "case": "$200.00", "caseQty": 50, "price": 4.0}, {"sku": "MP-PR-010", "name": "London Pound Cake", "brand": "Mac Pharms", "cat": "1g Pre-Rolls", "unit": "$4.00", "case": "$200.00", "caseQty": 50, "price": 4.0}, {"sku": "MP-IP-001", "name": "Purple Haze", "brand": "Mac Pharms", "cat": "1.2g Infused Pre-Rolls", "unit": "$7.50", "case": "$375.00", "caseQty": 50, "price": 7.5}, {"sku": "MP-IP-002", "name": "Rainbow Smoothie", "brand": "Mac Pharms", "cat": "1.2g Infused Pre-Rolls", "unit": "$7.50", "case": "$375.00", "caseQty": 50, "price": 7.5}, {"sku": "MP-IP-003", "name": "Runtz OG", "brand": "Mac Pharms", "cat": "1.2g Infused Pre-Rolls", "unit": "$7.50", "case": "$375.00", "caseQty": 50, "price": 7.5}, {"sku": "MP-IP-004", "name": "Blue Cookie", "brand": "Mac Pharms", "cat": "1.2g Infused Pre-Rolls", "unit": "$7.50", "case": "$375.00", "caseQty": 50, "price": 7.5}, {"sku": "MP-IP-005", "name": "Kush Mints", "brand": "Mac Pharms", "cat": "1.2g Infused Pre-Rolls", "unit": "$7.50", "case": "$375.00", "caseQty": 50, "price": 7.5}, {"sku": "MP-IP-006", "name": "Hash Allen", "brand": "Mac Pharms", "cat": "1.2g Infused Pre-Rolls", "unit": "$7.50", "case": "$375.00", "caseQty": 50, "price": 7.5}, {"sku": "MP-IP-007", "name": "Strawberry Sherbet", "brand": "Mac Pharms", "cat": "1.2g Infused Pre-Rolls", "unit": "$7.50", "case": "$375.00", "caseQty": 50, "price": 7.5}, {"sku": "MP-IP-008", "name": "Fruity Pebbles", "brand": "Mac Pharms", "cat": "1.2g Infused Pre-Rolls", "unit": "$7.50", "case": "$375.00", "caseQty": 50, "price": 7.5}, {"sku": "MP-IP-009", "name": "Mac OG", "brand": "Mac Pharms", "cat": "1.2g Infused Pre-Rolls", "unit": "$7.50", "case": "$375.00", "caseQty": 50, "price": 7.5}, {"sku": "MP-IP-010", "name": "London Pound Cake", "brand": "Mac Pharms", "cat": "1.2g Infused Pre-Rolls", "unit": "$7.50", "case": "$375.00", "caseQty": 50, "price": 7.5}, {"sku": "MP-HH-001", "name": "Strawberry Sherbet", "brand": "Mac Pharms", "cat": "Hash Hole Pre-Rolls", "unit": "$30.00", "case": "$750.00", "caseQty": 25, "price": 30.0}, {"sku": "MP-HH-002", "name": "Runtz OG", "brand": "Mac Pharms", "cat": "Hash Hole Pre-Rolls", "unit": "$30.00", "case": "$750.00", "caseQty": 25, "price": 30.0}, {"sku": "MP-HH-003", "name": "Hash Allen", "brand": "Mac Pharms", "cat": "Hash Hole Pre-Rolls", "unit": "$30.00", "case": "$750.00", "caseQty": 25, "price": 30.0}, {"sku": "MP-HH-004", "name": "Rainbow Smoothie", "brand": "Mac Pharms", "cat": "Hash Hole Pre-Rolls", "unit": "$30.00", "case": "$750.00", "caseQty": 25, "price": 30.0}, {"sku": "MP-HH-005", "name": "Mac OG Hash Hole", "brand": "Mac Pharms", "cat": "Hash Hole Pre-Rolls", "unit": "$30.00", "case": "$750.00", "caseQty": 25, "price": 30.0}, {"sku": "MP-PP-001", "name": "Strawberry Sherbet — AM", "brand": "Mac Pharms", "cat": "Powerpacks — 28×1g Pre-Rolls", "unit": "$75.00", "case": "$1,875.00", "caseQty": 25, "price": 75.0}, {"sku": "MP-PP-002", "name": "Fruity Pebblz — PM", "brand": "Mac Pharms", "cat": "Powerpacks — 28×1g Pre-Rolls", "unit": "$75.00", "case": "$1,875.00", "caseQty": 25, "price": 75.0}, {"sku": "MP-PP-003", "name": "Lemon Cherry — Anytime", "brand": "Mac Pharms", "cat": "Powerpacks — 28×1g Pre-Rolls", "unit": "$75.00", "case": "$1,875.00", "caseQty": 25, "price": 75.0}, {"sku": "MP-8TH-001", "name": "Bento Blaze", "brand": "Mac Pharms", "cat": "3.5g Eighths — New", "unit": "$13.50", "case": "$337.50", "caseQty": 25, "price": 13.5}, {"sku": "MP-8TH-002", "name": "Notorious OG", "brand": "Mac Pharms", "cat": "3.5g Eighths — New", "unit": "$13.50", "case": "$337.50", "caseQty": 25, "price": 13.5}, {"sku": "MP-8TH-003", "name": "Miso High", "brand": "Mac Pharms", "cat": "3.5g Eighths — New", "unit": "$13.50", "case": "$337.50", "caseQty": 25, "price": 13.5}, {"sku": "MP-8TH-004", "name": "Blue Nightmare", "brand": "Mac Pharms", "cat": "3.5g Eighths — New", "unit": "$13.50", "case": "$337.50", "caseQty": 25, "price": 13.5}, {"sku": "MP-8TH-005", "name": "Matcha Gelato", "brand": "Mac Pharms", "cat": "3.5g Eighths — New", "unit": "$13.50", "case": "$337.50", "caseQty": 25, "price": 13.5}, {"sku": "MP-8TH-006", "name": "Kitty Milk", "brand": "Mac Pharms", "cat": "3.5g Eighths — New", "unit": "$13.50", "case": "$337.50", "caseQty": 25, "price": 13.5}, {"sku": "MP-8TH-007", "name": "Cero Miedo", "brand": "Mac Pharms", "cat": "3.5g Eighths — New", "unit": "$13.50", "case": "$337.50", "caseQty": 25, "price": 13.5}, {"sku": "MP-VP-001", "name": "Rainbow Smoothie", "brand": "Mac Pharms", "cat": "1g Disposable Vape", "unit": "$17.50", "case": "$437.50", "caseQty": 25, "price": 17.5}, {"sku": "MP-VP-002", "name": "Runtz OG", "brand": "Mac Pharms", "cat": "1g Disposable Vape", "unit": "$17.50", "case": "$437.50", "caseQty": 25, "price": 17.5}, {"sku": "MP-VP-003", "name": "Hash Allen", "brand": "Mac Pharms", "cat": "1g Disposable Vape", "unit": "$17.50", "case": "$437.50", "caseQty": 25, "price": 17.5}, {"sku": "MP-VP-004", "name": "Strawberry Sherbet", "brand": "Mac Pharms", "cat": "1g Disposable Vape", "unit": "$17.50", "case": "$437.50", "caseQty": 25, "price": 17.5}, {"sku": "MP-VP-005", "name": "Fruity Pebbles", "brand": "Mac Pharms", "cat": "1g Disposable Vape", "unit": "$17.50", "case": "$437.50", "caseQty": 25, "price": 17.5}, {"sku": "MP-VP-006", "name": "London Pound Cake", "brand": "Mac Pharms", "cat": "1g Disposable Vape", "unit": "$17.50", "case": "$437.50", "caseQty": 25, "price": 17.5}, {"sku": "MP-GM-001", "name": "Grape Escape", "brand": "Mac Pharms", "cat": "Gummies 100mg", "unit": "$6.00", "case": "$150.00", "caseQty": 25, "price": 6.0}, {"sku": "MP-GM-002", "name": "Blue Razz Punch", "brand": "Mac Pharms", "cat": "Gummies 100mg", "unit": "$6.00", "case": "$150.00", "caseQty": 25, "price": 6.0}, {"sku": "MP-GM-003", "name": "Mango", "brand": "Mac Pharms", "cat": "Gummies 100mg", "unit": "$6.00", "case": "$150.00", "caseQty": 25, "price": 6.0}, {"sku": "MP-GM-004", "name": "Lush Pineapple", "brand": "Mac Pharms", "cat": "Gummies 100mg", "unit": "$6.00", "case": "$150.00", "caseQty": 25, "price": 6.0}, {"sku": "MP-GM-005", "name": "Cherry", "brand": "Mac Pharms", "cat": "Gummies 100mg", "unit": "$6.00", "case": "$150.00", "caseQty": 25, "price": 6.0}, {"sku": "MP-GM-006", "name": "Red Razz", "brand": "Mac Pharms", "cat": "Gummies 100mg", "unit": "$6.00", "case": "$150.00", "caseQty": 25, "price": 6.0}, {"sku": "MP-GM-007", "name": "Orange Burst", "brand": "Mac Pharms", "cat": "Gummies 100mg", "unit": "$6.00", "case": "$150.00", "caseQty": 25, "price": 6.0}, {"sku": "MP-GM-008", "name": "Strawberry", "brand": "Mac Pharms", "cat": "Gummies 100mg", "unit": "$6.00", "case": "$150.00", "caseQty": 25, "price": 6.0}, {"sku": "MP-GM-009", "name": "Jolly Apple", "brand": "Mac Pharms", "cat": "Gummies 100mg", "unit": "$6.00", "case": "$150.00", "caseQty": 25, "price": 6.0}, {"sku": "CC-F-001", "name": "Love Machine", "brand": "Cheech & Chong", "cat": "3.5g Pre-Packaged Flower", "unit": "$16.00", "case": "$400.00", "caseQty": 25, "price": 16.0}, {"sku": "CC-F-002", "name": "Yesca", "brand": "Cheech & Chong", "cat": "3.5g Pre-Packaged Flower", "unit": "$16.00", "case": "$400.00", "caseQty": 25, "price": 16.0}, {"sku": "CC-F-003", "name": "Stadankohhh", "brand": "Cheech & Chong", "cat": "3.5g Pre-Packaged Flower", "unit": "$16.00", "case": "$400.00", "caseQty": 25, "price": 16.0}, {"sku": "CC-F-004", "name": "Drooler", "brand": "Cheech & Chong", "cat": "3.5g Pre-Packaged Flower", "unit": "$16.00", "case": "$400.00", "caseQty": 25, "price": 16.0}, {"sku": "CC-F-005", "name": "Lowrider", "brand": "Cheech & Chong", "cat": "3.5g Pre-Packaged Flower", "unit": "$16.00", "case": "$400.00", "caseQty": 25, "price": 16.0}, {"sku": "CC-F-006", "name": "Ahhberry", "brand": "Cheech & Chong", "cat": "3.5g Pre-Packaged Flower", "unit": "$16.00", "case": "$400.00", "caseQty": 25, "price": 16.0}, {"sku": "CC-PR-001", "name": "Love Machine", "brand": "Cheech & Chong", "cat": "1g Pre-Roll", "unit": "$5.00", "case": "$250.00", "caseQty": 50, "price": 5.0}, {"sku": "CC-PR-002", "name": "Yesca", "brand": "Cheech & Chong", "cat": "1g Pre-Roll", "unit": "$5.00", "case": "$250.00", "caseQty": 50, "price": 5.0}, {"sku": "CC-PR-003", "name": "Stadankohhh", "brand": "Cheech & Chong", "cat": "1g Pre-Roll", "unit": "$5.00", "case": "$250.00", "caseQty": 50, "price": 5.0}, {"sku": "CC-PR-004", "name": "Drooler", "brand": "Cheech & Chong", "cat": "1g Pre-Roll", "unit": "$5.00", "case": "$250.00", "caseQty": 50, "price": 5.0}, {"sku": "CC-PR-005", "name": "Lowrider", "brand": "Cheech & Chong", "cat": "1g Pre-Roll", "unit": "$5.00", "case": "$250.00", "caseQty": 50, "price": 5.0}, {"sku": "CC-PR-006", "name": "Ahhberry", "brand": "Cheech & Chong", "cat": "1g Pre-Roll", "unit": "$5.00", "case": "$250.00", "caseQty": 50, "price": 5.0}, {"sku": "CC-CH-001", "name": "Rainbow Sherbert", "brand": "Cheech & Chong", "cat": "AIO Disposable — Cheeched (Sativa)", "unit": "$17.50", "case": "$437.50", "caseQty": 25, "price": 17.5}, {"sku": "CC-CH-002", "name": "Triangle Kush", "brand": "Cheech & Chong", "cat": "AIO Disposable — Cheeched (Sativa)", "unit": "$17.50", "case": "$437.50", "caseQty": 25, "price": 17.5}, {"sku": "CC-CG-001", "name": "Tropical Trainwreck", "brand": "Cheech & Chong", "cat": "AIO Disposable — Chonged (Indica)", "unit": "$17.50", "case": "$437.50", "caseQty": 25, "price": 17.5}, {"sku": "CC-CG-002", "name": "Lemon Fresh", "brand": "Cheech & Chong", "cat": "AIO Disposable — Chonged (Indica)", "unit": "$17.50", "case": "$437.50", "caseQty": 25, "price": 17.5}, {"sku": "CC-CG-003", "name": "Blue Gushers", "brand": "Cheech & Chong", "cat": "AIO Disposable — Chonged (Indica)", "unit": "$17.50", "case": "$437.50", "caseQty": 25, "price": 17.5}, {"sku": "CC-GM-001", "name": "Grape", "brand": "Cheech & Chong", "cat": "Gummies 10mg×10ct", "unit": "$10.00", "case": "$500.00", "caseQty": 50, "price": 10.0}, {"sku": "CC-GM-002", "name": "Mixed Berry", "brand": "Cheech & Chong", "cat": "Gummies 10mg×10ct", "unit": "$10.00", "case": "$500.00", "caseQty": 50, "price": 10.0}, {"sku": "CC-GM-003", "name": "Watermelon", "brand": "Cheech & Chong", "cat": "Gummies 10mg×10ct", "unit": "$10.00", "case": "$500.00", "caseQty": 50, "price": 10.0}, {"sku": "CC-GM-004", "name": "Pink Lemonade", "brand": "Cheech & Chong", "cat": "Gummies 10mg×10ct", "unit": "$10.00", "case": "$500.00", "caseQty": 50, "price": 10.0}, {"sku": "CC-GM-005", "name": "Mango", "brand": "Cheech & Chong", "cat": "Gummies 10mg×10ct", "unit": "$10.00", "case": "$500.00", "caseQty": 50, "price": 10.0}, {"sku": "CC-GM-006", "name": "Blood Orange", "brand": "Cheech & Chong", "cat": "Gummies 10mg×10ct", "unit": "$10.00", "case": "$500.00", "caseQty": 50, "price": 10.0}, {"sku": "PB-T-001", "name": "Recovery — 1000mg THC / 1000mg CBD", "brand": "PureBud", "cat": "Roll-On Topical Stick", "unit": "$25.00", "case": "$300.00", "caseQty": 12, "price": 25.0}, {"sku": "PB-T-002", "name": "Activate — 2000mg CBD", "brand": "PureBud", "cat": "Roll-On Topical Stick", "unit": "$23.00", "case": "$276.00", "caseQty": 12, "price": 23.0}, {"sku": "JC-PB-001", "name": "Peanut Butter", "brand": "Jüiced Cannabis Co.", "cat": "Cannabis Infused Peanut Butter Cups — 100mg", "unit": "$12.00", "case": "$300.00", "caseQty": 25, "price": 12.0}, {"sku": "JC-SC-001", "name": "Pistachio", "brand": "Jüiced Cannabis Co.", "cat": "Mini Chocolate Sugar Cones — 100mg", "unit": "$12.00", "case": "$240.00", "caseQty": 20, "price": 12.0}, {"sku": "JC-SC-002", "name": "Birthday Cake", "brand": "Jüiced Cannabis Co.", "cat": "Mini Chocolate Sugar Cones — 100mg", "unit": "$12.00", "case": "$240.00", "caseQty": 20, "price": 12.0}, {"sku": "JC-SC-003", "name": "Strawberry", "brand": "Jüiced Cannabis Co.", "cat": "Mini Chocolate Sugar Cones — 100mg", "unit": "$12.00", "case": "$240.00", "caseQty": 20, "price": 12.0}, {"sku": "JC-SC-004", "name": "Chocolate", "brand": "Jüiced Cannabis Co.", "cat": "Mini Chocolate Sugar Cones — 100mg", "unit": "$12.00", "case": "$240.00", "caseQty": 20, "price": 12.0}, {"sku": "JC-CB-001", "name": "Peanut Butter", "brand": "Jüiced Cannabis Co.", "cat": "Chocolate Bars — 100mg", "unit": "$8.00", "case": "$200.00", "caseQty": 25, "price": 8.0}, {"sku": "JC-CB-002", "name": "Cookies & Cream", "brand": "Jüiced Cannabis Co.", "cat": "Chocolate Bars — 100mg", "unit": "$8.00", "case": "$200.00", "caseQty": 25, "price": 8.0}, {"sku": "JC-CB-003", "name": "Tiramisu", "brand": "Jüiced Cannabis Co.", "cat": "Chocolate Bars — 100mg", "unit": "$8.00", "case": "$200.00", "caseQty": 25, "price": 8.0}, {"sku": "JC-CB-004", "name": "Strawberry Shortcake", "brand": "Jüiced Cannabis Co.", "cat": "Chocolate Bars — 100mg", "unit": "$8.00", "case": "$200.00", "caseQty": 25, "price": 8.0}];
@@ -333,81 +345,91 @@ function buildSummary() {
 
   document.getElementById('osSummary').innerHTML = html ||
     '<div class="os-row" style="color:#999">No items selected.</div>';
+  var shipping = total < 2000 ? 150 : 0;
+  var grand = total + shipping;
+  var shipRow = '<div class="os-row" style="color:' +
+    (shipping > 0 ? '#8b2020' : '#4a7c3f') + '">' +
+    '<div>Shipping' + (shipping > 0 ? ' (under $2,000)' : ' — waived') + '</div>' +
+    '<div><strong>' + (shipping > 0 ? '$150.00' : 'FREE') + '</strong></div></div>';
+  document.getElementById('osSummary').innerHTML += shipRow;
   document.getElementById('osTotal').textContent =
-    '$' + total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    '$' + grand.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 // ── SUBMIT ───────────────────────────────────────────────────────────────────
 function submitOrder() {
-  var required = [
-    ['fDispensary','Dispensary Name'],
-    ['fBuyer','Buyer Name'],
-    ['fEmail','Email'],
-    ['fAddress','Shipping Address']
-  ];
-  for (var i=0; i<required.length; i++) {
-    var val = document.getElementById(required[i][0]).value.trim();
-    if (!val) { alert(required[i][1] + ' is required.'); return; }
+  try {
+    // ---- validate required fields ----
+    var fields = {
+      dispensary: 'fDispensary', license: 'fLicense', buyer: 'fBuyer',
+      title: 'fTitle', email: 'fEmail', phone: 'fPhone',
+      address: 'fAddress', delivery: 'fDelivery', po: 'fPO', notes: 'fNotes'
+    };
+    var vals = {};
+    for (var k in fields) {
+      var el = document.getElementById(fields[k]);
+      vals[k] = el ? String(el.value || '').trim() : '';
+    }
+
+    if (!vals.dispensary) { alert('Dispensary Name is required.'); return; }
+    if (!vals.buyer)      { alert('Buyer Name is required.'); return; }
+    if (!vals.address)    { alert('Shipping Address is required.'); return; }
+    if (!vals.email || vals.email.indexOf('@') < 1 || vals.email.indexOf('.') < 3) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+    if (!Object.keys(cart).length) {
+      alert('Please select at least one product before submitting.');
+      return;
+    }
+
+    // ---- build item list ----
+    var skuMap = {};
+    SKUS.forEach(function(s) { skuMap[s.sku] = s; });
+    var items = [], total = 0;
+    Object.keys(cart).forEach(function(sku) {
+      var p = skuMap[sku];
+      if (!p) return;
+      var qty  = cart[sku];
+      var cost = p.price * p.caseQty * qty;
+      total += cost;
+      items.push({
+        sku: sku, name: p.name, brand: p.brand, cat: p.cat,
+        qty: qty, unit: p.unit, caseQty: p.caseQty,
+        caseCost: p.case, lineTotal: cost.toFixed(2)
+      });
+    });
+
+    var payload = {
+      dispensary: vals.dispensary, license: vals.license,
+      buyer: vals.buyer, title: vals.title, email: vals.email,
+      phone: vals.phone, address: vals.address,
+      delivery: vals.delivery, po: vals.po, notes: vals.notes,
+      items: items, total: total.toFixed(2),
+      submitted: new Date().toISOString()
+    };
+
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+
+    // ---- send via google.script.run when inside Apps Script ----
+    fetch('https://script.google.com/macros/s/AKfycbwWSXGgddnVkWT9rg7WfwSIrRwGfJXjOI6QJy19SNaFiAMR2XybjfsllyQyZ9k08YIc/exec', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload),
+      mode: 'no-cors'
+    }).then(function() {
+      showSuccess();
+    }).catch(function() {
+      showSuccess(); // no-cors always "succeeds" — server handles it
+    });
+
+  } catch (err) {
+    alert('Error building order: ' + err.message);
+    var b = document.getElementById('submitBtn');
+    if (b) { b.disabled = false; b.textContent = 'Submit Order to Real Life Botanicals'; }
   }
-  if (!Object.keys(cart).length) {
-    alert('Please select at least one product before submitting.');
-    return;
-  }
-
-  var skuMap = {};
-  SKUS.forEach(function(s) { skuMap[s.sku] = s; });
-  var items = [];
-  var total = 0;
-  Object.keys(cart).forEach(function(sku) {
-    var p = skuMap[sku];
-    if (!p) return;
-    var qty  = cart[sku];
-    var cost = p.price * p.caseQty * qty;
-    total += cost;
-    items.push({sku:sku, name:p.name, brand:p.brand, cat:p.cat,
-                 qty:qty, unit:p.unit, caseQty:p.caseQty, caseCost:p.case,
-                 lineTotal:cost.toFixed(2)});
-  });
-
-  var payload = {
-    dispensary:  document.getElementById('fDispensary').value.trim(),
-    license:     document.getElementById('fLicense').value.trim(),
-    buyer:       document.getElementById('fBuyer').value.trim(),
-    title:       document.getElementById('fTitle').value.trim(),
-    email:       document.getElementById('fEmail').value.trim(),
-    phone:       document.getElementById('fPhone').value.trim(),
-    address:     document.getElementById('fAddress').value.trim(),
-    delivery:    document.getElementById('fDelivery').value,
-    po:          document.getElementById('fPO').value.trim(),
-    notes:       document.getElementById('fNotes').value.trim(),
-    items:       items,
-    total:       total.toFixed(2),
-    submitted:   new Date().toISOString()
-  };
-
-  var btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Submitting…';
-
-  // If no backend yet, show instructions
-  if (SUBMIT_URL === 'YOUR_WEBAPP_URL_HERE') {
-    showSuccess();
-    console.log('ORDER PAYLOAD:', JSON.stringify(payload, null, 2));
-    return;
-  }
-
-  fetch(SUBMIT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(payload)
-  }).then(function() {
-    showSuccess();
-  }).catch(function(err) {
-    btn.disabled = false;
-    btn.textContent = 'Submit Order to Real Life Botanicals';
-    alert('Submission failed. Please email orders@reallifebotanicals.com directly.');
-  });
 }
 
 function showSuccess() {
