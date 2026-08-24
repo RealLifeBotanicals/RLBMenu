@@ -318,37 +318,43 @@ function buildSummary() {
   var skuMap = {};
   SKUS.forEach(function(s) { skuMap[s.sku] = s; });
 
-  // Deal: Mac Pharms 1g Disposable Vapes — buy 3 cases, get 1 free.
-  // Every 4th case of the same SKU is free.
-  function freeCases(sku, qty) {
-    if (/^MP-VP-/.test(sku)) return Math.floor(qty / 4);
-    return 0;
-  }
+  // Deal: Mac Pharms 1g Disposable Vapes — buy 4 cases, get 1 free.
+  // Pooled across ALL vape strains: every 4 cases total = 1 free case.
+  // Free cases are credited at the vape unit case price.
+  var vapeCases = 0, vapeCasePrice = 0;
+  Object.keys(cart).forEach(function(sku) {
+    if (/^MP-VP-/.test(sku)) {
+      var p = skuMap[sku];
+      if (p) { vapeCases += cart[sku]; vapeCasePrice = p.price * p.caseQty; }
+    }
+  });
+  var vapeFree = Math.floor(vapeCases / 4);          // total free cases across strains
+  var vapeCredit = vapeFree * vapeCasePrice;         // dollar value to deduct
 
   Object.keys(cart).sort().forEach(function(sku) {
     var p = skuMap[sku];
     if (!p) return;
-    var qty      = cart[sku];
-    var free     = freeCases(sku, qty);
-    var billable = qty - free;
-    var cost     = p.price * p.caseQty * billable;
+    var qty  = cart[sku];
+    var cost = p.price * p.caseQty * qty;
     total += cost;
-
-    var dealNote = free > 0
-      ? '<div class="brand-tag-sm" style="color:#4a7c3f;font-weight:700">' +
-        '🔥 Buy 3 get 1 free — ' + free + ' case' + (free>1?'s':'') + ' free' + '</div>'
-      : '';
 
     html += '<div class="os-row">' +
       '<div><div><strong>' + p.name + '</strong></div>' +
-      '<div class="brand-tag-sm">' + p.brand + ' &nbsp;·&nbsp; ' + p.cat + '</div>' +
-      dealNote + '</div>' +
-      '<div>' + (free > 0
-        ? billable + ' &times; ' + p.case + ' <span style="color:#999">(' +
-          qty + ' ordered, ' + free + ' free)</span>'
-        : qty + ' case' + (qty>1?'s':'') + ' &times; ' + p.case) +
+      '<div class="brand-tag-sm">' + p.brand + ' &nbsp;·&nbsp; ' + p.cat + '</div></div>' +
+      '<div>' + qty + ' case' + (qty>1?'s':'') + ' &times; ' + p.case +
       ' = <strong>$' + cost.toFixed(2) + '</strong></div></div>';
   });
+
+  // Apply the pooled vape deal as a single credit line
+  if (vapeFree > 0) {
+    total -= vapeCredit;
+    html += '<div class="os-row" style="color:#4a7c3f">' +
+      '<div><div><strong>🔥 Mac Pharms Vape Deal</strong></div>' +
+      '<div class="brand-tag-sm">Buy 4 cases, get 1 free — ' + vapeCases +
+      ' vape cases ordered</div></div>' +
+      '<div><strong>&minus;' + vapeFree + ' case' + (vapeFree>1?'s':'') +
+      ' = &minus;$' + vapeCredit.toFixed(2) + '</strong></div></div>';
+  }
 
   document.getElementById('osSummary').innerHTML = html ||
     '<div class="os-row" style="color:#999">No items selected.</div>';
@@ -391,30 +397,53 @@ function submitOrder() {
     }
 
     // ---- build item list ----
-    // Deal: Mac Pharms 1g Disposable Vapes — buy 3 cases, get 1 free.
-    function freeCases(sku, qty) {
-      if (/^MP-VP-/.test(sku)) return Math.floor(qty / 4);
-      return 0;
-    }
     var skuMap = {};
     SKUS.forEach(function(s) { skuMap[s.sku] = s; });
+
+    // Deal: Mac Pharms vapes — buy 4 cases get 1 free, POOLED across all
+    // vape strains. Every 4 vape cases total = 1 free case (credited at
+    // the vape case price).
+    var vapeCases = 0, vapeCasePrice = 0;
+    Object.keys(cart).forEach(function(sku) {
+      if (/^MP-VP-/.test(sku)) {
+        var pp = skuMap[sku];
+        if (pp) { vapeCases += cart[sku]; vapeCasePrice = pp.price * pp.caseQty; }
+      }
+    });
+    var vapeFree = Math.floor(vapeCases / 4);
+    var vapeCredit = vapeFree * vapeCasePrice;
+
     var items = [], total = 0;
     Object.keys(cart).forEach(function(sku) {
       var p = skuMap[sku];
       if (!p) return;
-      var qty      = cart[sku];
-      var free     = freeCases(sku, qty);
-      var billable = qty - free;
-      var cost     = p.price * p.caseQty * billable;
+      var qty  = cart[sku];
+      var cost = p.price * p.caseQty * qty;
       total += cost;
       items.push({
         sku: sku, name: p.name, brand: p.brand, cat: p.cat,
-        qty: qty, freeCases: free, billableCases: billable,
-        unit: p.unit, caseQty: p.caseQty,
-        caseCost: p.case, lineTotal: cost.toFixed(2),
-        deal: free > 0 ? 'Buy 3 get 1 free (' + free + ' free)' : ''
+        qty: qty, unit: p.unit, caseQty: p.caseQty,
+        caseCost: p.case, lineTotal: cost.toFixed(2)
       });
     });
+
+    // Apply pooled vape deal as a discount line + summary fields
+    var vapeDeal = null;
+    if (vapeFree > 0) {
+      total -= vapeCredit;
+      vapeDeal = {
+        description: 'Mac Pharms vape deal — buy 4 get 1 free',
+        vapeCasesOrdered: vapeCases,
+        freeCases: vapeFree,
+        creditAmount: vapeCredit.toFixed(2)
+      };
+      items.push({
+        sku: 'DEAL-MPVAPE', name: '🔥 Mac Pharms Vape Deal (buy 4 get 1 free)',
+        brand: 'Mac Pharms', cat: 'Discount',
+        qty: -vapeFree, unit: '', caseQty: '',
+        caseCost: '', lineTotal: (-vapeCredit).toFixed(2)
+      });
+    }
 
     var payload = {
       dispensary: vals.dispensary, license: vals.license,
@@ -422,6 +451,7 @@ function submitOrder() {
       phone: vals.phone, address: vals.address,
       delivery: vals.delivery, po: vals.po, notes: vals.notes,
       items: items, total: total.toFixed(2),
+      vapeDeal: vapeDeal,
       submitted: new Date().toISOString()
     };
 
