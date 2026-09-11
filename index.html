@@ -45,11 +45,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;ba
 .pr.alt{background:#faf9f6}.pr:last-child td{border-bottom:none}.pr.in-cart{background:#f0faf0!important}
 .pname{font-weight:600;font-size:12.5px}
 .detail-row{display:table-row}
-.detail-panel{display:flex;gap:14px;padding:14px 16px;background:#fbfaf7;border-bottom:1px solid #eee;align-items:flex-start}
-.detail-img{width:120px;height:120px;object-fit:cover;border-radius:8px;flex-shrink:0;background:#eee}
-.detail-text{font-size:12.5px;color:#444;line-height:1.6}
+.detail-panel{display:flex;gap:12px;padding:10px 16px;background:#fbfaf7;border-bottom:1px solid #eee;align-items:center}
+.detail-img{width:64px;height:64px;object-fit:cover;border-radius:6px;flex-shrink:0;background:#eee}
+.detail-text{font-size:11.5px;color:#555;line-height:1.5}
 .detail-text p{margin:0}
-@media(max-width:640px){.detail-panel{flex-direction:column}.detail-img{width:100%;height:180px}}
+@media(max-width:640px){.detail-img{width:52px;height:52px}.detail-text{font-size:11px}}
 .tpill{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
 .thc{font-weight:700;text-align:center}.num{text-align:center;color:#555}
 .gold{font-weight:700;color:#8a6d1f;text-align:center}
@@ -118,7 +118,7 @@ Tropical mixed punch — sweet, bold, and clean. Same precision extraction, same
 
 Fresh strawberry, clean finish. This syrup hits fast with zero cannabis aftertaste — just bold, true-to-fruit flavor in a compact shot.</p></div></div></td></tr></tbody></table></div></div></section></main>
 <footer class="site-footer">Real Life Botanicals &nbsp;·&nbsp; Halton Hay Inc &nbsp;·&nbsp; OCM-DIST-24-000049-DX1<br>orders@reallifebotanicals.com &nbsp;·&nbsp; @REAL.LIFE.BOTANICALS<br>Pricing subject to change. Availability subject to inventory and regulatory compliance.<br><br><a href="https://app.distru.com/menu/real-life-botanicals/menu" target="_blank">View our official Distru menu &rarr;</a></footer>
-<div class="cart-btn" id="cartBtn" onclick="openModal()">ð Review &amp; Submit Order <span class="cart-count" id="cartCount">0</span></div>
+<div class="cart-btn" id="cartBtn" onclick="openModal()">&#128722; Review &amp; Submit Order <span class="cart-count" id="cartCount">0</span></div>
 <div class="modal-overlay" id="modalOverlay"><div class="modal"><div class="modal-hdr"><h2>Complete Your Order</h2><button class="modal-close" onclick="closeModal()">✕</button></div><div class="modal-body"><div class="slbl">Buyer Information</div><div class="fgrid"><div class="fg"><label>DISPENSARY NAME *</label><input type="text" id="fDispensary" placeholder="Your dispensary name" autocomplete="organization"></div><div class="fg"><label>NYS OCM LICENSE #</label><input type="text" id="fLicense" placeholder="CAURD-XX-000000"></div><div class="fg"><label>BUYER NAME *</label><input type="text" id="fBuyer" placeholder="First and last name" autocomplete="name"></div><div class="fg"><label>TITLE</label><input type="text" id="fTitle" placeholder="Buyer / Owner / Manager"></div><div class="fg"><label>EMAIL *</label><input type="email" id="fEmail" placeholder="you@dispensary.com" autocomplete="email" inputmode="email"></div><div class="fg"><label>PHONE</label><input type="tel" id="fPhone" placeholder="(555) 000-0000" autocomplete="tel" inputmode="tel"></div></div><div class="fgrid full"><div class="fg"><label>SHIPPING ADDRESS *</label><input type="text" id="fAddress" placeholder="Street, City, State, ZIP" autocomplete="street-address"></div><div class="fg"><label>REQUESTED DELIVERY DATE</label><input type="date" id="fDelivery"></div><div class="fg"><label>PURCHASE ORDER # (Optional)</label><input type="text" id="fPO" placeholder="PO number if applicable"></div></div><div class="slbl">Order Summary</div><div style="border:1px solid #eee;border-radius:var(--r);overflow:hidden;margin-bottom:16px"><div class="os-hdr"><span>PRODUCT</span><span>QTY × CASE COST</span></div><div id="osSummary"></div><div class="os-total"><span>ESTIMATED TOTAL</span><span id="osTotal">$0.00</span></div></div><div class="slbl">Notes</div><textarea class="notes-area" id="fNotes" placeholder="Special instructions, questions…"></textarea><button class="submit-btn" id="submitBtn" onclick="submitOrder()">Submit Order to Real Life Botanicals</button><div class="success-msg" id="successMsg">✓ Order submitted! Check your email for a confirmation. We will follow up within 1 business day.</div></div></div></div>
 <script>
 var SUBMIT_URL="https://script.google.com/macros/s/AKfycbwWSXGgddnVkWT9rg7WfwSIrRwGfJXjOI6QJy19SNaFiAMR2XybjfsllyQyZ9k08YIc/exec";
